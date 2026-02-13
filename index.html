@@ -3,39 +3,89 @@
 <head>
 <meta charset="UTF-8">
 <title>Gerador de Justificativa Escolar</title>
+
 <style>
 body {
-    font-family: Arial;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #4e73df, #1cc88a);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 350px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     text-align: center;
-    margin: 40px;
 }
+
+h2 {
+    margin-bottom: 20px;
+}
+
 input, textarea {
-    width: 300px;
+    width: 100%;
     padding: 8px;
-    margin: 5px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
 }
+
 button {
-    padding: 10px 20px;
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    background: #4e73df;
+    color: white;
+    font-weight: bold;
     cursor: pointer;
+    transition: 0.3s;
 }
+
+button:hover {
+    background: #2e59d9;
+}
+
 #resultado {
-    margin-top: 20px;
+    margin-top: 15px;
+    text-align: left;
     white-space: pre-line;
+    font-size: 14px;
+}
+
+.copy-btn {
+    background: #1cc88a;
+}
+
+.copy-btn:hover {
+    background: #17a673;
 }
 </style>
 </head>
 
 <body>
 
-<h2>Gerador de Justificativa Escolar</h2>
+<div class="container">
 
-<input type="text" id="nome" placeholder="Nome do aluno"><br>
-<input type="date" id="data"><br>
-<textarea id="motivo" placeholder="Digite o motivo da ausência"></textarea><br>
+<h2>Gerador de Justificativa</h2>
+
+<input type="text" id="nome" placeholder="Nome do aluno">
+<input type="date" id="data">
+<textarea id="motivo" placeholder="Motivo da ausência"></textarea>
 
 <button onclick="gerar()">Gerar Justificativa</button>
+<button class="copy-btn" onclick="copiar()">Copiar Texto</button>
 
 <div id="resultado"></div>
+
+</div>
 
 <script>
 function gerar() {
@@ -51,6 +101,12 @@ function gerar() {
         + "Atenciosamente.";
 
     document.getElementById("resultado").innerText = texto;
+}
+
+function copiar() {
+    var texto = document.getElementById("resultado").innerText;
+    navigator.clipboard.writeText(texto);
+    alert("Texto copiado com sucesso!");
 }
 </script>
 
