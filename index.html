@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Gerador de Justificativa Escolar</title>
+<style>
+body {
+    font-family: Arial;
+    text-align: center;
+    margin: 40px;
+}
+input, textarea {
+    width: 300px;
+    padding: 8px;
+    margin: 5px;
+}
+button {
+    padding: 10px 20px;
+    cursor: pointer;
+}
+#resultado {
+    margin-top: 20px;
+    white-space: pre-line;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Gerador de Justificativa Escolar</h2>
+
+<input type="text" id="nome" placeholder="Nome do aluno"><br>
+<input type="date" id="data"><br>
+<textarea id="motivo" placeholder="Digite o motivo da ausência"></textarea><br>
+
+<button onclick="gerar()">Gerar Justificativa</button>
+
+<div id="resultado"></div>
+
+<script>
+function gerar() {
+    var nome = document.getElementById("nome").value;
+    var data = document.getElementById("data").value;
+    var motivo = document.getElementById("motivo").value;
+
+    var texto = "Prezada(o) Professora(o),\n\n"
+        + "Venho por meio desta justificar a ausência do(a) aluno(a) "
+        + nome + " no dia " + data + ".\n\n"
+        + "O motivo da ausência foi: " + motivo + ".\n\n"
+        + "Agradeço a compreensão.\n\n"
+        + "Atenciosamente.";
+
+    document.getElementById("resultado").innerText = texto;
+}
+</script>
+
+</body>
+</html>
