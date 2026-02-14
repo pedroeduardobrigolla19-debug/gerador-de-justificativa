@@ -1,49 +1,282 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador de Justificativa</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerador de Justificativa</title>
 
-    <link rel="stylesheet" href="style.css">
+<style>
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #4e73df, #1cc88a);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background: white;
+    padding: 35px;
+    border-radius: 20px;
+    width: 450px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+}
+
+input:focus, select:focus {
+    border-color: #4e73df;
+    outline: none;
+    box-shadow: 0 0 5px rgba(78,115,223,0.3);
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 12px;
+    border: none;
+    border-radius: 10px;
+    background: #4e73df;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #2e59d9;
+}
+
+#resultado {
+    margin-top: 20px;
+    white-space: pre-line;
+    background: #f8f9fc;
+    padding: 15px;
+    border-radius: 12px;
+    line-height: 1.6;
+}
+</style>
 </head>
 
 <body>
 
-    <div class="container">
+<div class="container">
 
-        <h2>Gerador de Justificativa</h2>
+<h2>Gerador de Justificativa</h2>
 
-        <input type="text" id="recebedorNome" placeholder="Nome de quem vai receber">
+<select id="destinatarioTipo">
+    <option value="Professor">Professor</option>
+    <option value="Professora">Professora</option>
+    <option value="Pedagogo">Pedagogo</option>
+    <option value="Pedagoga">Pedagoga</option>
+    <option value="Outro">Outro</option>
+</select>
 
-        <select id="tom">
-            <option value="formal">Formal</option>
-            <option value="informal">Informal (Aluno)</option>
-        </select>
+<input type="text" id="destinatarioOutro" placeholder="Digite o destinatário" style="display:none;">
 
-        <input type="text" id="nomeAluno" placeholder="Nome do aluno">
+<input type="text" id="recebedorNome" placeholder="Nome de quem vai receber">
 
-        <input type="date" id="data">
+<select id="modo">
+    <option value="formal">Formal (Responsável)</option>
+    <option value="informal">Informal (Aluno)</option>
+</select>
 
-        <select id="motivo">
-            <option value="doenca">Doença</option>
-            <option value="consulta">Consulta médica</option>
-            <option value="familia">Compromisso familiar</option>
-            <option value="pessoal">Problema pessoal</option>
-            <option value="outro">Outro</option>
-        </select>
+<select id="generoAluno">
+    <option value="aluno">Aluno</option>
+    <option value="aluna">Aluna</option>
+</select>
 
-        <input type="text" id="motivoOutro" placeholder="Descreva o motivo" style="display:none;">
+<input type="text" id="nomeAluno" placeholder="Nome do aluno(a)">
 
-        <button onclick="gerar()">Gerar Justificativa</button>
+<input type="date" id="data" min="2020-01-01">
 
-        <div id="resultado"></div>
+<select id="motivo">
+    <option value="doenca">Doença</option>
+    <option value="consulta">Consulta médica</option>
+    <option value="familia">Compromisso familiar</option>
+    <option value="pessoal">Problema pessoal</option>
+    <option value="outro">Outro</option>
+</select>
 
-    </div>
+<input type="text" id="motivoOutro" placeholder="Descreva o motivo" style="display:none;">
 
-    <script src="generator.js"></script>
-    <script src="script.js"></script>
+<button onclick="gerar()">Gerar Justificativa</button>
+
+<div id="resultado"></div>
+
+</div>
+
+<script>
+
+// ===== CONFIG DATA =====
+const dataInput = document.getElementById("data");
+dataInput.max = new Date().toISOString().split("T")[0];
+
+// ===== MOSTRAR CAMPOS OUTRO =====
+document.getElementById("motivo").addEventListener("change", function() {
+    document.getElementById("motivoOutro").style.display =
+        this.value === "outro" ? "block" : "none";
+});
+
+document.getElementById("destinatarioTipo").addEventListener("change", function() {
+    document.getElementById("destinatarioOutro").style.display =
+        this.value === "Outro" ? "block" : "none";
+});
+
+// ===== VALIDAÇÃO DE DATA FORTE =====
+function validarData(data) {
+    const min = new Date("2020-01-01");
+    const hoje = new Date();
+
+    const partes = data.split("-");
+    if (partes.length !== 3) return false;
+
+    const ano = parseInt(partes[0]);
+    const mes = parseInt(partes[1]) - 1;
+    const dia = parseInt(partes[2]);
+
+    const dataObj = new Date(ano, mes, dia);
+
+    if (
+        dataObj.getFullYear() !== ano ||
+        dataObj.getMonth() !== mes ||
+        dataObj.getDate() !== dia
+    ) return false;
+
+    return dataObj >= min && dataObj <= hoje;
+}
+
+// ===== FORMATAR DATA =====
+function formatarData(data) {
+    const meses = [
+        "janeiro","fevereiro","março","abril","maio","junho",
+        "julho","agosto","setembro","outubro","novembro","dezembro"
+    ];
+    const partes = data.split("-");
+    return partes[2] + " de " + meses[parseInt(partes[1])-1] + " de " + partes[0];
+}
+
+// ===== BANCO INTELIGENTE =====
+const banco = {
+    formal: {
+        introducoes: [
+            "Prezado(a) {{destinatario}},",
+            "À {{destinatario}},",
+            "Caro(a) {{destinatario}},"
+        ],
+        finais: [
+            "Agradeço a compreensão.",
+            "Coloco-me à disposição para esclarecimentos.",
+            "Desde já agradeço a atenção."
+        ]
+    },
+    informal: {
+        introducoes: [
+            "Olá {{destinatario}},",
+            "Oi {{destinatario}},"
+        ],
+        finais: [
+            "Obrigado(a) pela compreensão.",
+            "Peço desculpas pela ausência.",
+            "Agradeço a atenção."
+        ]
+    }
+};
+
+const motivosBanco = {
+    doenca: [
+        "no dia {{data}} não pôde comparecer devido a um mal-estar que exigiu repouso.",
+        "em {{data}} precisou permanecer em casa por questões de saúde.",
+        "esteve impossibilitado(a) de comparecer em {{data}} por motivo de saúde."
+    ],
+    consulta: [
+        "no dia {{data}} precisou comparecer a uma consulta médica.",
+        "em {{data}} teve atendimento médico previamente agendado.",
+        "precisou faltar em {{data}} por conta de compromisso médico."
+    ],
+    familia: [
+        "em {{data}} teve um compromisso familiar importante.",
+        "precisou se ausentar em {{data}} por questão familiar.",
+        "não pôde comparecer em {{data}} devido a assunto familiar."
+    ],
+    pessoal: [
+        "em {{data}} enfrentou um imprevisto pessoal.",
+        "não conseguiu comparecer em {{data}} por motivo pessoal.",
+        "teve uma situação particular em {{data}}."
+    ],
+    outro: [
+        "em {{data}} não pôde comparecer porque {{motivoPersonalizado}}.",
+        "a ausência em {{data}} ocorreu pois {{motivoPersonalizado}}."
+    ]
+};
+
+// ===== GERADOR =====
+function gerar() {
+
+    const tipo = document.getElementById("destinatarioTipo").value;
+    const destinatarioOutro = document.getElementById("destinatarioOutro").value;
+    const nomeRecebe = document.getElementById("recebedorNome").value.trim();
+    const modo = document.getElementById("modo").value;
+    const genero = document.getElementById("generoAluno").value;
+    const nomeAluno = document.getElementById("nomeAluno").value.trim();
+    const data = document.getElementById("data").value;
+    const motivo = document.getElementById("motivo").value;
+    const motivoOutro = document.getElementById("motivoOutro").value;
+
+    if (!nomeRecebe || !nomeAluno || !data) {
+        alert("Preencha todos os campos.");
+        return;
+    }
+
+    if (!validarData(data)) {
+        alert("Data inválida.");
+        return;
+    }
+
+    const dataFormatada = formatarData(data);
+    const destinatarioFinal =
+        tipo === "Outro" ? destinatarioOutro + " " + nomeRecebe : tipo + " " + nomeRecebe;
+
+    const intro = banco[modo].introducoes[Math.floor(Math.random()*banco[modo].introducoes.length)];
+    const final = banco[modo].finais[Math.floor(Math.random()*banco[modo].finais.length)];
+    const corpoBase = motivosBanco[motivo][Math.floor(Math.random()*motivosBanco[motivo].length)];
+
+    let corpo = corpoBase
+        .replace("{{data}}", dataFormatada)
+        .replace("{{motivoPersonalizado}}", motivoOutro || "");
+
+    let texto;
+
+    if (modo === "formal") {
+        texto = intro.replace("{{destinatario}}", destinatarioFinal)
+        + "\n\nVenho por meio desta justificar a ausência do(a) "
+        + genero + " " + nomeAluno + ", pois "
+        + corpo + "\n\n"
+        + final;
+    } else {
+        texto = intro.replace("{{destinatario}}", destinatarioFinal)
+        + "\n\nEu, " + nomeAluno + ", não compareci à aula porque "
+        + corpo + "\n\n"
+        + final;
+    }
+
+    document.getElementById("resultado").innerText = texto;
+}
+
+</script>
 
 </body>
 </html>
