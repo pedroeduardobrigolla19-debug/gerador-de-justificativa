@@ -19,16 +19,12 @@ body {
     background: white;
     padding: 30px;
     border-radius: 15px;
-    width: 380px;
+    width: 400px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     text-align: center;
 }
 
-h2 {
-    margin-bottom: 15px;
-}
-
-input, textarea, select {
+input, select {
     width: 100%;
     padding: 8px;
     margin: 8px 0;
@@ -46,19 +42,10 @@ button {
     color: white;
     font-weight: bold;
     cursor: pointer;
-    transition: 0.3s;
 }
 
 button:hover {
     background: #2e59d9;
-}
-
-.copy-btn {
-    background: #1cc88a;
-}
-
-.copy-btn:hover {
-    background: #17a673;
 }
 
 #resultado {
@@ -76,72 +63,92 @@ button:hover {
 
 <h2>Gerador de Justificativa</h2>
 
-<select id="destinatario">
-    <option value="Professor">Professor</option>
-    <option value="Professora">Professora</option>
-    <option value="Pedagogo">Pedagogo</option>
-    <option value="Pedagoga">Pedagoga</option>
-</select>
-
-<select id="genero">
-    <option value="Aluno">Aluno</option>
-    <option value="Aluna">Aluna</option>
-</select>
-
-<select id="tom">
-    <option value="formal">Formal (Responsável)</option>
-    <option value="informal">Informal (Aluno)</option>
-</select>
-
-<input type="text" id="nome" placeholder="Nome">
+<input type="text" id="recebedor" placeholder="Nome de quem vai receber">
+<input type="text" id="nome" placeholder="Nome do aluno">
 <input type="date" id="data">
-<textarea id="motivo" placeholder="Motivo da ausência"></textarea>
+
+<select id="motivo">
+    <option value="doenca">Doença</option>
+    <option value="consulta">Consulta médica</option>
+    <option value="familia">Compromisso familiar</option>
+    <option value="pessoal">Problema pessoal</option>
+    <option value="outro">Outro</option>
+</select>
 
 <button onclick="gerar()">Gerar Justificativa</button>
-<button class="copy-btn" onclick="copiar()">Copiar Texto</button>
 
 <div id="resultado"></div>
 
 </div>
 
 <script>
+
+function fraseAleatoria(lista) {
+    return lista[Math.floor(Math.random() * lista.length)];
+}
+
 function gerar() {
 
-    var destinatario = document.getElementById("destinatario").value;
-    var genero = document.getElementById("genero").value;
-    var tom = document.getElementById("tom").value;
+    var recebedor = document.getElementById("recebedor").value;
     var nome = document.getElementById("nome").value;
     var data = document.getElementById("data").value;
     var motivo = document.getElementById("motivo").value;
 
-    var texto = "";
+    var frases = {
 
-    if(tom === "formal") {
+        doenca: [
+            "apresentou um quadro de indisposição e precisou permanecer em repouso",
+            "não estava se sentindo bem e foi orientado(a) a descansar",
+            "teve sintomas que impediram sua presença na escola",
+            "necessitou de repouso devido a mal-estar",
+            "enfrentou problemas de saúde no período"
+        ],
 
-        texto = "Prezado(a) " + destinatario + ",\n\n"
-        + "Venho por meio desta justificar a ausência do(a) "
-        + genero.toLowerCase() + " " + nome + " no dia " + data + ".\n\n"
-        + "O motivo da ausência foi: " + motivo + ".\n\n"
-        + "Agradeço a compreensão.\n\n"
+        consulta: [
+            "compareceu a uma consulta médica previamente agendada",
+            "realizou atendimento médico necessário",
+            "precisou passar por avaliação médica",
+            "teve compromisso clínico importante",
+            "foi submetido(a) a atendimento de saúde"
+        ],
+
+        familia: [
+            "teve um compromisso familiar inadiável",
+            "precisou acompanhar um familiar em situação importante",
+            "participou de um compromisso familiar necessário",
+            "esteve envolvido(a) em questões familiares urgentes",
+            "precisou resolver assuntos familiares relevantes"
+        ],
+
+        pessoal: [
+            "precisou resolver questões pessoais importantes",
+            "enfrentou uma situação pessoal inesperada",
+            "teve um imprevisto de caráter pessoal",
+            "passou por uma situação particular que exigiu atenção",
+            "precisou lidar com circunstâncias pessoais"
+        ],
+
+        outro: [
+            "não pôde comparecer por motivos relevantes",
+            "teve um impedimento importante",
+            "enfrentou circunstâncias que impossibilitaram sua presença",
+            "passou por um imprevisto significativo",
+            "não conseguiu estar presente por razões justificáveis"
+        ]
+    };
+
+    var fraseEscolhida = fraseAleatoria(frases[motivo]);
+
+    var texto = "Prezado(a) " + recebedor + ",\n\n"
+        + "Venho por meio desta justificar a ausência do(a) aluno(a) "
+        + nome + " no dia " + data + ", pois "
+        + fraseEscolhida + ".\n\n"
+        + "Contamos com sua compreensão e nos colocamos à disposição para eventuais esclarecimentos.\n\n"
         + "Atenciosamente.";
-
-    } else {
-
-        texto = "Olá " + destinatario + ",\n\n"
-        + "Eu, " + nome + ", não pude comparecer à aula no dia "
-        + data + " porque " + motivo + ".\n\n"
-        + "Peço desculpas pelo ocorrido e agradeço a compreensão.";
-
-    }
 
     document.getElementById("resultado").innerText = texto;
 }
 
-function copiar() {
-    var texto = document.getElementById("resultado").innerText;
-    navigator.clipboard.writeText(texto);
-    alert("Texto copiado com sucesso!");
-}
 </script>
 
 </body>
