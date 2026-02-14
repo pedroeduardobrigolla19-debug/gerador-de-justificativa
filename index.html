@@ -1,107 +1,18 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Gerador de Justificativa Escolar</title>
+// Mostrar campo "Outro"
+document.getElementById("motivo").addEventListener("change", function() {
+    const outro = document.getElementById("motivoOutro");
+    outro.style.display = this.value === "outro" ? "block" : "none";
+});
 
-<style>
-body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #4e73df, #1cc88a);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
+// Validação real da data
+function validarData(data) {
+    const min = new Date("2020-01-01");
+    const hoje = new Date();
+    const dataObj = new Date(data);
+
+    return dataObj >= min && dataObj <= hoje;
 }
 
-.container {
-    background: white;
-    padding: 30px;
-    border-radius: 15px;
-    width: 420px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    text-align: center;
-}
-
-input, select {
-    width: 100%;
-    padding: 8px;
-    margin: 8px 0;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-}
-
-button {
-    width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-    border: none;
-    border-radius: 8px;
-    background: #4e73df;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #2e59d9;
-}
-
-#resultado {
-    margin-top: 15px;
-    text-align: left;
-    white-space: pre-line;
-    font-size: 14px;
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-<h2>Gerador de Justificativa</h2>
-
-<select id="destinatarioTipo">
-    <option value="Professor">Professor</option>
-    <option value="Professora">Professora</option>
-    <option value="Pedagogo">Pedagogo</option>
-    <option value="Pedagoga">Pedagoga</option>
-</select>
-
-<input type="text" id="recebedorNome" placeholder="Nome de quem vai receber">
-
-<select id="tom">
-    <option value="formal">Formal (Responsável)</option>
-    <option value="informal">Informal (Aluno)</option>
-</select>
-
-<input type="text" id="nomeAluno" placeholder="Nome do aluno">
-
-<input type="date" id="data">
-
-<select id="motivo">
-    <option value="doenca">Doença</option>
-    <option value="consulta">Consulta médica</option>
-    <option value="familia">Compromisso familiar</option>
-    <option value="pessoal">Problema pessoal</option>
-</select>
-
-<button onclick="gerar()">Gerar Justificativa</button>
-
-<div id="resultado"></div>
-
-</div>
-
-<script>
-
-// Definir limite mínimo e máximo da data
-const dataInput = document.getElementById("data");
-dataInput.min = "2020-01-01";
-dataInput.max = new Date().toISOString().split("T")[0];
-
-// Função para formatar data bonita
 function formatarData(data) {
     const meses = [
         "janeiro","fevereiro","março","abril","maio","junho",
@@ -112,84 +23,39 @@ function formatarData(data) {
     return partes[2] + " de " + meses[parseInt(partes[1])-1] + " de " + partes[0];
 }
 
-// Frases por motivo
-const frases = {
-    doenca: [
-        "apresentou um quadro de indisposição e precisou permanecer em repouso",
-        "não estava se sentindo bem e foi orientado(a) a descansar",
-        "teve sintomas que impediram sua presença na escola",
-        "necessitou de repouso devido a mal-estar",
-        "enfrentou problemas de saúde no período"
-    ],
-    consulta: [
-        "compareceu a uma consulta médica previamente agendada",
-        "realizou atendimento médico necessário",
-        "precisou passar por avaliação médica",
-        "teve compromisso clínico importante",
-        "foi submetido(a) a atendimento de saúde"
-    ],
-    familia: [
-        "teve um compromisso familiar inadiável",
-        "precisou acompanhar um familiar em situação importante",
-        "participou de um compromisso familiar necessário",
-        "esteve envolvido(a) em questões familiares urgentes",
-        "precisou resolver assuntos familiares relevantes"
-    ],
-    pessoal: [
-        "precisou resolver questões pessoais importantes",
-        "enfrentou uma situação pessoal inesperada",
-        "teve um imprevisto de caráter pessoal",
-        "passou por uma situação particular que exigiu atenção",
-        "precisou lidar com circunstâncias pessoais"
-    ]
-};
-
-function fraseAleatoria(lista) {
-    return lista[Math.floor(Math.random() * lista.length)];
-}
-
 function gerar() {
 
-    var tipo = document.getElementById("destinatarioTipo").value;
-    var recebedorNome = document.getElementById("recebedorNome").value;
-    var tom = document.getElementById("tom").value;
-    var nomeAluno = document.getElementById("nomeAluno").value;
-    var data = document.getElementById("data").value;
-    var motivo = document.getElementById("motivo").value;
+    const nomeDestinatario = document.getElementById("recebedorNome").value.trim();
+    const modo = document.getElementById("tom").value;
+    const nomeAluno = document.getElementById("nomeAluno").value.trim();
+    const data = document.getElementById("data").value;
+    const motivo = document.getElementById("motivo").value;
+    const motivoPersonalizado = document.getElementById("motivoOutro").value;
 
-    if(!data){
-        alert("Por favor, selecione uma data válida.");
+    if (!nomeDestinatario || !nomeAluno || !data) {
+        alert("Preencha todos os campos obrigatórios.");
         return;
     }
 
-    var dataFormatada = formatarData(data);
-    var fraseEscolhida = fraseAleatoria(frases[motivo]);
-
-    var texto = "";
-
-    if(tom === "formal"){
-
-        texto = "Prezado(a) " + tipo + " " + recebedorNome + ",\n\n"
-        + "Venho por meio desta justificar a ausência do(a) aluno(a) "
-        + nomeAluno + " no dia " + dataFormatada + ", pois "
-        + fraseEscolhida + ".\n\n"
-        + "Contamos com sua compreensão e nos colocamos à disposição para eventuais esclarecimentos.\n\n"
-        + "Atenciosamente.";
-
-    } else {
-
-        texto = "Olá " + tipo + " " + recebedorNome + ",\n\n"
-        + "Eu, " + nomeAluno + ", não pude comparecer à aula no dia "
-        + dataFormatada + " porque "
-        + fraseEscolhida + ".\n\n"
-        + "Peço desculpas pelo ocorrido e agradeço a compreensão.";
-
+    if (!validarData(data)) {
+        alert("Data inválida. A data deve estar entre 01/01/2020 e hoje.");
+        return;
     }
+
+    const dados = {
+        modo: modo,
+        motivo: motivo,
+        nomeDestinatario: nomeDestinatario,
+        dataFormatada: formatarData(data),
+        referenciaAluno: modo === "formal" ? "o(a) aluno(a) " + nomeAluno : "",
+        motivoPersonalizado: motivo === "outro" ? motivoPersonalizado : ""
+    };
+
+    const texto = gerarTexto(dados);
 
     document.getElementById("resultado").innerText = texto;
 }
-
-</script>
-
-</body>
-</html>
+<script src="generator.js"></script>
+<script src="script.js"></script>
+<option value="outro">Outro</option>
+<input type="text" id="motivoOutro" placeholder="Descreva o motivo" style="display:none;">
